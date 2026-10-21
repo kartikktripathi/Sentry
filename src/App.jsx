@@ -8,69 +8,90 @@ export default function App() {
   const allGranted = screenGranted && cameraGranted;
 
   return (
-    <div className="permission-container">
-      {/* Header */}
-      <div className="permission-header">
-        <span className="brand-label">SENTRY</span>
-        <div className="title-wrap">
-          <h1 className="permission-title">Permissions Required</h1>
-          <p className="permission-subtitle">
-            Grant the following permissions to begin your assessment session.
+    <div className="dev-container">
+      {/* Title Bar */}
+      <div className="dev-titlebar">
+        <span className="dev-titlebar-tag">SENTRY</span>
+        <span className={`dev-titlebar-status ${allGranted ? "ready" : ""}`}>
+          {allGranted ? "Ready" : "Permissions"}
+        </span>
+      </div>
+
+      {/* Main Content */}
+      <div className="dev-body">
+        <div className="dev-header">
+          <h1 className="dev-title">Permissions Required</h1>
+          <p className="dev-subtitle">
+            Please allow the following permissions to begin your assessment
+            session.
           </p>
         </div>
-      </div>
 
-      {/* Permission List: Screen and Camera */}
-      <div className="permission-list">
-        {/* Screen Permission */}
-        <div className={`permission-item ${screenGranted ? "granted" : ""}`}>
-          <div className="permission-text">
-            <span className="permission-name">Screen access</span>
-            <span className="permission-desc">
-              Permission to access and record your display
-            </span>
+        <div className="dev-permission-list">
+          {/* Permission 1: Screen */}
+          <div className="dev-permission-row">
+            <div
+              className={`dev-permission-box ${screenGranted ? "granted" : ""}`}
+            >
+              <div className="dev-permission-meta">
+                <span className="dev-name">Screen access</span>
+                <span className="dev-desc">
+                  Permission to access and record your display
+                </span>
+              </div>
+
+              <button
+                type="button"
+                className={`dev-btn ${screenGranted ? "btn-granted" : "btn-pending"}`}
+                onClick={() => setScreenGranted((prev) => !prev)}
+              >
+                {screenGranted ? "Allowed" : "Allow"}
+              </button>
+            </div>
+
+            {/* Black screen placeholder next to screen permission */}
+            {screenGranted && <div className="dev-feed-screen"></div>}
           </div>
 
-          <button
-            type="button"
-            className={`btn-toggle ${screenGranted ? "allowed" : "pending"}`}
-            onClick={() => setScreenGranted((prev) => !prev)}
-          >
-            {screenGranted ? "Allowed" : "Allow"}
-          </button>
-        </div>
+          {/* Permission 2: Camera */}
+          <div className="dev-permission-row">
+            <div
+              className={`dev-permission-box ${cameraGranted ? "granted" : ""}`}
+            >
+              <div className="dev-permission-meta">
+                <span className="dev-name">Camera access</span>
+                <span className="dev-desc">
+                  Permission to access your webcam
+                </span>
+              </div>
 
-        {/* Camera Permission */}
-        <div className={`permission-item ${cameraGranted ? "granted" : ""}`}>
-          <div className="permission-text">
-            <span className="permission-name">Camera access</span>
-            <span className="permission-desc">
-              Permission to access your webcam
-            </span>
+              <button
+                type="button"
+                className={`dev-btn ${cameraGranted ? "btn-granted" : "btn-pending"}`}
+                onClick={() => setCameraGranted((prev) => !prev)}
+              >
+                {cameraGranted ? "Allowed" : "Allow"}
+              </button>
+            </div>
+
+            {/* Black screen placeholder next to camera permission */}
+            {cameraGranted && <div className="dev-feed-screen"></div>}
           </div>
+        </div>
 
+        {/* Footer / Continue */}
+        <div className="dev-footer">
           <button
             type="button"
-            className={`btn-toggle ${cameraGranted ? "allowed" : "pending"}`}
-            onClick={() => setCameraGranted((prev) => !prev)}
+            className={`dev-continue-btn ${allGranted ? "active" : "disabled"}`}
+            disabled={!allGranted}
           >
-            {cameraGranted ? "Allowed" : "Allow"}
+            Continue
           </button>
+          <div className="dev-note">
+            Permissions are only active during your exam session.
+          </div>
         </div>
-      </div>
-
-      {/* Footer / Continue */}
-      <div className="permission-footer">
-        <button
-          type="button"
-          className={`btn-continue ${allGranted ? "active" : "disabled"}`}
-          disabled={!allGranted}
-        >
-          Continue
-        </button>
-        <p className="footer-note">
-          Permissions are only active during your exam session.
-        </p>
       </div>
     </div>
   );
