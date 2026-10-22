@@ -36,7 +36,7 @@ export default function App() {
               <div className="dev-permission-meta">
                 <span className="dev-name">Screen access</span>
                 <span className="dev-desc">
-                  Permission to access and record your display
+                  Permission to access and record your display and turn full-screen mode on
                 </span>
               </div>
 

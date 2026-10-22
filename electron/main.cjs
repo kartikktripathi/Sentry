@@ -1,4 +1,4 @@
-const { BrowserWindow, app } = require("electron");
+const { BrowserWindow, app, ipcMain } = require("electron");
 const path = require("path");
 
 function createWindow() {
@@ -8,9 +8,16 @@ function createWindow() {
     width: 1000,
     height: 700,
     icon: iconPath,
+    webPreferences: {
+      preload: path.join(__dirname, "preload.cjs"),
+    },
   });
 
   win.loadURL("http://localhost:5173/");
+
+  ipcMain.on('set-fullscreen', () => {
+    win.setFullScreen(true)
+  })
 }
 
 app.whenReady().then(() => {
