@@ -15,9 +15,28 @@ export default function App() {
     }
   }
 
-  // Cleanup screen capture track on unmount
+  // Helper to completely reset permissions and stop streams
+  const resetPermissions = () => {
+    if (screenStreamRef.current) {
+      screenStreamRef.current.getTracks().forEach((track) => track.stop());
+      screenStreamRef.current = null;
+    }
+    setScreenGranted(false);
+  };
+
   useEffect(() => {
+    const unsubscribe = window.electronAPI?.onExitFullscreen?.(() => {
+      resetPermissions();
+    });
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        resetPermissions();
+      }
+    };
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+
     return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
       if (screenStreamRef.current) {
         screenStreamRef.current.getTracks().forEach((track) => track.stop());
       }
@@ -26,11 +45,7 @@ export default function App() {
 
   const handleToggleScreen = async () => {
     if (screenGranted) {
-      if (screenStreamRef.current) {
-        screenStreamRef.current.getTracks().forEach((track) => track.stop());
-        screenStreamRef.current = null;
-      }
-      setScreenGranted(false);
+      resetPermissions();
       return;
     }
 
@@ -39,28 +54,30 @@ export default function App() {
 
       let stream = null;
 
-      // In Electron: fetch desktop source and capture with getUserMedia
       if (window.electronAPI?.getScreenSources) {
-        const sources = await window.electronAPI.getScreenSources();
-        const primarySource = sources[0];
-        if (primarySource) {
-          stream = await navigator.mediaDevices.getUserMedia({
-            audio: false,
-            video: {
-              mandatory: {
-                chromeMediaSource: "desktop",
-                chromeMediaSourceId: primarySource.id,
-                minWidth: 1280,
-                maxWidth: 1920,
-                minHeight: 720,
-                maxHeight: 1080,
+        try {
+          const sources = await window.electronAPI.getScreenSources();
+          const primarySource = sources[0];
+          if (primarySource) {
+            stream = await navigator.mediaDevices.getUserMedia({
+              audio: false,
+              video: {
+                mandatory: {
+                  chromeMediaSource: "desktop",
+                  chromeMediaSourceId: primarySource.id,
+                  minWidth: 1280,
+                  maxWidth: 1920,
+                  minHeight: 720,
+                  maxHeight: 1080,
+                },
               },
-            },
-          });
+            });
+          }
+        } catch (ipcErr) {
+          console.warn("Electron desktopCapturer stream failed, attempting getDisplayMedia fallback:", ipcErr);
         }
       }
 
-      // Fallback for standard browser
       if (!stream && navigator.mediaDevices?.getDisplayMedia) {
         stream = await navigator.mediaDevices.getDisplayMedia({
           video: { displaySurface: "monitor" },
@@ -75,17 +92,15 @@ export default function App() {
         const videoTrack = stream.getVideoTracks()[0];
         if (videoTrack) {
           videoTrack.onended = () => {
-            if (screenStreamRef.current) {
-              screenStreamRef.current.getTracks().forEach((track) => track.stop());
-              screenStreamRef.current = null;
-            }
-            setScreenGranted(false);
+            resetPermissions();
           };
         }
+      } else {
+        setScreenGranted(false);
       }
     } catch (err) {
       console.error("Screen access error:", err);
-      setScreenGranted(false);
+      resetPermissions();
     }
   };
 

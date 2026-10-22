@@ -18,13 +18,26 @@ function createWindow() {
   ipcMain.on("set-fullscreen", () => {
     win.setFullScreen(true);
   });
+
+  // Notify renderer when user exits full screen
+  win.on("leave-full-screen", () => {
+    win.webContents.send("exit-fullscreen");
+  });
 }
 
-// Handler to provide screen sources for screen capture
+// Handler to provide screen sources for desktop capture
 ipcMain.handle("get-screen-sources", async () => {
   try {
-    const sources = await desktopCapturer.getSources({ types: ["screen"] });
-    return sources.map((s) => ({ id: s.id, name: s.name }));
+    const sources = await desktopCapturer.getSources({
+      types: ["screen", "window"],
+      thumbnailSize: { width: 1, height: 1 },
+    });
+
+    const screenSources = sources.filter((s) => s.id.startsWith("screen"));
+    return (screenSources.length > 0 ? screenSources : sources).map((s) => ({
+      id: s.id,
+      name: s.name,
+    }));
   } catch (err) {
     console.error("Error retrieving screen sources:", err);
     return [];
@@ -41,17 +54,22 @@ app.whenReady().then(() => {
   if (session && session.defaultSession) {
     session.defaultSession.setDisplayMediaRequestHandler((request, callback) => {
       desktopCapturer
-        .getSources({ types: ["screen"] })
+        .getSources({
+          types: ["screen", "window"],
+          thumbnailSize: { width: 1, height: 1 },
+        })
         .then((sources) => {
-          if (sources.length > 0) {
-            callback({ video: sources[0] });
+          const screenSources = sources.filter((s) => s.id.startsWith("screen"));
+          const selected = screenSources.length > 0 ? screenSources[0] : sources[0];
+          if (selected) {
+            callback({ video: selected });
           } else {
-            callback({});
+            callback(null);
           }
         })
         .catch((err) => {
           console.error("Error in setDisplayMediaRequestHandler:", err);
-          callback({});
+          callback(null);
         });
     });
   }
