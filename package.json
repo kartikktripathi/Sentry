@@ -35,8 +35,7 @@
       ],
       "category": "public.app-category.education",
       "icon": "electron/icon.png",
-      "hardenedRuntime": true,
-      "gatekeeperAssess": false
+      "identity": null
     },
     "dmg": {
       "contents": [
