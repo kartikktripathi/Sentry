@@ -13,7 +13,13 @@ function createWindow() {
     },
   });
 
-  win.loadURL("http://localhost:5173/");
+  if (app.isPackaged) {
+    win.loadFile(path.join(__dirname, "../dist/index.html"));
+  } else {
+    win.loadURL("http://localhost:5173/").catch(() => {
+      win.loadFile(path.join(__dirname, "../dist/index.html"));
+    });
+  }
 
   ipcMain.on("set-fullscreen", () => {
     win.setFullScreen(true);
