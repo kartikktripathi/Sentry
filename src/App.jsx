@@ -297,7 +297,7 @@ export default function App() {
               </div>
             </div>
 
-            {/* Footer / Continue */}
+            {/* Footer / Continue to Main Test */}
             <div className="dev-footer">
               <button
                 type="button"
@@ -305,14 +305,7 @@ export default function App() {
                 disabled={!allGranted}
                 onClick={startExam}
               >
-                Continue to Exam
-              </button>
-              <button
-                type="button"
-                className="dev-skip-link"
-                onClick={startExam}
-              >
-                Start sample exam directly (Testing mode)
+                Continue to Assessment
               </button>
               <div className="dev-note">
                 Permissions are only active during your exam session.
@@ -322,7 +315,7 @@ export default function App() {
         </>
       )}
 
-      {/* VIEW 2: EXAM SCREEN */}
+      {/* VIEW 2: EXAM / ASSESSMENT SCREEN */}
       {currentView === "exam" && (
         <>
           {/* Exam Topbar */}
