@@ -1,0 +1,57 @@
+[
+  {
+    "id": 1,
+    "question": "What is the value of 15 × 8?",
+    "options": [
+      { "id": "A", "text": "110" },
+      { "id": "B", "text": "120" },
+      { "id": "C", "text": "125" },
+      { "id": "D", "text": "130" }
+    ],
+    "correctAnswer": "B"
+  },
+  {
+    "id": 2,
+    "question": "If 3x + 7 = 22, what is the value of x?",
+    "options": [
+      { "id": "A", "text": "3" },
+      { "id": "B", "text": "4" },
+      { "id": "C", "text": "5" },
+      { "id": "D", "text": "6" }
+    ],
+    "correctAnswer": "C"
+  },
+  {
+    "id": 3,
+    "question": "What is the square root of 144?",
+    "options": [
+      { "id": "A", "text": "11" },
+      { "id": "B", "text": "12" },
+      { "id": "C", "text": "14" },
+      { "id": "D", "text": "16" }
+    ],
+    "correctAnswer": "B"
+  },
+  {
+    "id": 4,
+    "question": "What is 25% of 160?",
+    "options": [
+      { "id": "A", "text": "35" },
+      { "id": "B", "text": "40" },
+      { "id": "C", "text": "45" },
+      { "id": "D", "text": "50" }
+    ],
+    "correctAnswer": "B"
+  },
+  {
+    "id": 5,
+    "question": "Calculate: 48 ÷ (6 × 2) + 3",
+    "options": [
+      { "id": "A", "text": "7" },
+      { "id": "B", "text": "19" },
+      { "id": "C", "text": "11" },
+      { "id": "D", "text": "8" }
+    ],
+    "correctAnswer": "A"
+  }
+]
