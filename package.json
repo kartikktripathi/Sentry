@@ -9,13 +9,14 @@
     "dev": "vite",
     "start": "electron .",
     "build": "vite build",
-    "build:mac": "vite build && electron-builder --mac dmg",
+    "build:mac": "vite build && electron-builder --mac dmg --publish never",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "build": {
     "appId": "com.sentry.exam",
     "productName": "Sentry",
+    "publish": null,
     "directories": {
       "output": "release"
     },
