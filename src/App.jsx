@@ -6,6 +6,7 @@ export default function App() {
   const [cameraGranted, setCameraGranted] = useState(false);
 
   const screenStreamRef = useRef(null);
+  const cameraStreamRef = useRef(null);
 
   const allGranted = screenGranted && cameraGranted;
 
@@ -14,6 +15,14 @@ export default function App() {
       window.electronAPI.setFullscreen();
     }
   }
+
+  const stopCameraStream = () => {
+    if (cameraStreamRef.current) {
+      cameraStreamRef.current.getTracks().forEach((track) => track.stop());
+      cameraStreamRef.current = null;
+    }
+    setCameraGranted(false);
+  };
 
   // Helper to completely reset permissions and stop streams
   const resetPermissions = () => {
@@ -37,11 +46,50 @@ export default function App() {
 
     return () => {
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      if (typeof unsubscribe === "function") {
+        unsubscribe();
+      }
       if (screenStreamRef.current) {
         screenStreamRef.current.getTracks().forEach((track) => track.stop());
       }
+      if (cameraStreamRef.current) {
+        cameraStreamRef.current.getTracks().forEach((track) => track.stop());
+      }
     };
   }, []);
+
+  const handleToggleCamera = async () => {
+    if (cameraGranted) {
+      stopCameraStream();
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          facingMode: "user",
+        },
+        audio: false,
+      });
+
+      if (stream) {
+        cameraStreamRef.current = stream;
+        setCameraGranted(true);
+
+        const videoTrack = stream.getVideoTracks()[0];
+        if (videoTrack) {
+          videoTrack.onended = () => {
+            stopCameraStream();
+          };
+        }
+      }
+    } catch (err) {
+      console.error("Camera access error:", err);
+      stopCameraStream();
+    }
+  };
 
   const handleToggleScreen = async () => {
     if (screenGranted) {
@@ -179,14 +227,29 @@ export default function App() {
               <button
                 type="button"
                 className={`dev-btn ${cameraGranted ? "btn-granted" : "btn-pending"}`}
-                onClick={() => setCameraGranted((prev) => !prev)}
+                onClick={handleToggleCamera}
               >
                 {cameraGranted ? "Allowed" : "Allow"}
               </button>
             </div>
 
-            {/* Black screen placeholder next to camera permission */}
-            {cameraGranted && <div className="dev-feed-screen"></div>}
+            {/* Black screen displaying camera feed next to camera permission */}
+            {cameraGranted && (
+              <div className="dev-feed-screen">
+                <video
+                  ref={(node) => {
+                    if (node && cameraStreamRef.current && node.srcObject !== cameraStreamRef.current) {
+                      node.srcObject = cameraStreamRef.current;
+                      node.play?.().catch(() => {});
+                    }
+                  }}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="dev-feed-video dev-camera-video"
+                />
+              </div>
+            )}
           </div>
         </div>
 

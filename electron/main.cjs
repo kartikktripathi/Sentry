@@ -50,8 +50,13 @@ app.whenReady().then(() => {
     app.dock.setIcon(dockIcon);
   }
 
-  // Handle standard getDisplayMedia requests
+  // Handle media/camera permission checks and requests
   if (session && session.defaultSession) {
+    session.defaultSession.setPermissionCheckHandler(() => true);
+    session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
+      callback(true);
+    });
+
     session.defaultSession.setDisplayMediaRequestHandler((request, callback) => {
       desktopCapturer
         .getSources({
